@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Testing System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .test-form {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status-section {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .status-idle { background-color: #6c757d; }
+        .status-running { 
+            background-color: #ffc107; 
+            animation: pulse 1.5s infinite;
+        }
+        .status-completed { background-color: #28a745; }
+        .status-error { background-color: #dc3545; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .results-section {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .results-header {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .results-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .results-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-success {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .status-error {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .screenshot-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .screenshot-link:hover {
+            text-decoration: underline;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 5px solid #667eea;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-table {
+                font-size: 14px;
+            }
+            
+            .results-table th,
+            .results-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🕷️ Web Testing System</h1>
+            <p>Automated website crawling, testing, and monitoring solution</p>
+        </div>
+
+        <div class="content">
+            <!-- Test Configuration Form -->
+            <div class="test-form">
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">🚀 Start New Test</h2>
+                <form id="testForm">
+                    <div class="form-group">
+                        <label for="domain">Domain Name *</label>
+                        <input type="text" id="domain" name="domain" placeholder="example.com or https://example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginUrl">Login URL (Optional)</label>
+                        <input type="text" id="loginUrl" name="loginUrl" placeholder="https://example.com/login">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username">Username (Optional)</label>
+                            <input type="text" id="username" name="username" placeholder="your-username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password (Optional)</label>
+                            <input type="password" id="password" name="password" placeholder="your-password">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maxDepth">Max Crawl Depth</label>
+                            <select id="maxDepth" name="maxDepth">
+                                <option value="1">1 - Surface Level</option>
+                                <option value="2">2 - Moderate</option>
+                                <option value="3" selected>3 - Deep (Recommended)</option>
+                                <option value="4">4 - Very Deep</option>
+                                <option value="5">5 - Maximum</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxUrls">Max URLs to Test</label>
+                            <select id="maxUrls" name="maxUrls">
+                                <option value="25">25 - Quick Test</option>
+                                <option value="50" selected>50 - Standard</option>
+                                <option value="100">100 - Comprehensive</option>
+                                <option value="200">200 - Full Suite</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="startBtn">Start Testing</button>
+                </form>
+            </div>
+
+            <!-- Test Status -->
+            <div class="status-section">
+                <h3 style="margin-bottom: 15px; color: #2c3e50;">📊 Test Status</h3>
+                <div id="statusDisplay">
+                    <span class="status-indicator status-idle"></span>
+                    <span>Ready to start testing</span>
+                </div>
+                <div id="progressSection" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                    <div id="progressText">Preparing test...</div>
+                </div>
+            </div>
+
+            <!-- Test Statistics -->
+            <div id="statsSection" style="display: none;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUrls">0</div>
+                        <div class="stat-label">Total URLs Found</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="testedUrls">0</div>
+                        <div class="stat-label">URLs Tested</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="failedUrls">0</div>
+                        <div class="stat-label">Failed Tests</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgResponseTime">0ms</div>
+                        <div class="stat-label">Avg Response Time</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div class="results-section">
+                <div class="results-header">
+                    📋 Test Results
+                </div>
+                <div id="resultsContainer">
+                    <div class="loading" id="loadingResults">No test results available yet</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let testInProgress = false;
+        let statusCheckInterval;
+
+        document.getElementById('testForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (testInProgress) {
+                alert('Test is already running!');
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            const testData = {
+                domain: formData.get('domain'),
+                login_url: formData.get('loginUrl') || null,
+                username: formData.get('username') || null,
+                password: formData.get('password') || null,
+                max_depth: parseInt(formData.get('maxDepth')),
+                max_urls: parseInt(formData.get('maxUrls'))
+            };
+
+            try {
+                const response = await fetch('/start_test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    testInProgress = true;
+                    updateStatus('running', 'Test started successfully');
+                    document.getElementById('startBtn').disabled = true;
+                    document.getElementById('progressSection').style.display = 'block';
+                    
+                    // Start checking status
+                    statusCheckInterval = setInterval(checkTestStatus, 2000);
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Error starting test: ' + error.message);
+            }
+        });
+
+        async function checkTestStatus() {
+            try {
+                const response = await fetch('/test_status');
+                const status = await response.json();
+
+                if (status.status === 'running') {
+                    updateStatus('running', 'Test in progress...');
+                    // You could add progress updates here if backend supports it
+                } else if (status.status === 'completed') {
+                    testInProgress = false;
+                    clearInterval(statusCheckInterval);
+                    updateStatus('completed', 'Test completed successfully');
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('progressSection').style.display = 'none';
+                    
+                    if (status.result) {
+                        displayTestResults(status.result);
+                        updateStats(status.result);
+                    }
+                    
+                    loadResults();
+                } else if (status.status === 'idle') {
+                    if (testInProgress) {
+                        // Test might have failed
+                        testInProgress = false;
+                        clearInterval(statusCheckInterval);
+                        updateStatus('error', 'Test may have failed');
+                        document.getElementById('startBtn').disabled = false;
+                        document.getElementById('progressSection').style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        }
+
+        function updateStatus(status, message) {
+            const statusDisplay = document.getElementById('statusDisplay');
+            const statusClasses = ['status-idle', 'status-running', 'status-completed', 'status-error'];
+            const indicator = statusDisplay.querySelector('.status-indicator');
+            
+            // Remove all status classes
+            statusClasses.forEach(cls => indicator.classList.remove(cls));
+            
+            // Add current status class
+            indicator.classList.add(`status-${status}`);
+            
+            // Update message
+            statusDisplay.querySelector('span:last-child').textContent = message;
+        }
+
+        function updateStats(result) {
+            document.getElementById('statsSection').style.display = 'block';
+            document.getElementById('totalUrls').textContent = result.total_urls || 0;
+            document.getElementById('testedUrls').textContent = result.crawled_urls || 0;
+            document.getElementById('failedUrls').textContent = result.failed_urls || 0;
+            
+            // Calculate average response time
+            if (result.test_results && result.test_results.length > 0) {
+                const totalTime = result.test_results.reduce((sum, test) => sum + (test.response_time || 0), 0);
+                const avgTime = (totalTime / result.test_results.length * 1000).toFixed(0);
+                document.getElementById('avgResponseTime').textContent = avgTime + 'ms';
+            }
+        }
+
+        async function loadResults(domain = null) {
+            try {
+                const url = domain ? `/results?domain=${encodeURIComponent(domain)}` : '/results';
+                const response = await fetch(url);
+                const results = await response.json();
+                
+                displayResults(results);
+            } catch (error) {
+                console.error('Error loading results:', error);
+                document.getElementById('resultsContainer').innerHTML = 
+                    '<div class="loading">Error loading results</div>';
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('resultsContainer');
+            
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div class="loading">No test results available yet</div>';
+                return;
+            }
+
+            let tableHTML = `
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>URL</th>
+                            <th>Status</th>
+                            <th>Response Time</th>
+                            <th>Page Title</th>
+                            <th>Forms</th>
+                            <th>Links</th>
+                            <th>Error</th>
+                            <th>Screenshot</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            results.forEach(result => {
+                const statusClass = result.error ? 'status-error' : 'status-success';
+                const statusText = result.error ? `Error (${result.status_code})` : `Success (${result.status_code})`;
+                const responseTime = result.response_time ? (result.response_time * 1000).toFixed(0) + 'ms' : 'N/A';
+                const screenshot = result.screenshot_path ? 
+                    `<a href="/screenshots/${result.screenshot_path.split('/').pop()}" target="_blank" class="screenshot-link">View</a>` : 
+                    'N/A';
+                const timestamp = new Date(result.timestamp).toLocaleString();
+                
+                tableHTML += `
+                    <tr>
+                        <td title="${result.url}">${truncateUrl(result.url)}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                        <td>${responseTime}</td>
+                        <td title="${result.page_title || ''}">${truncateText(result.page_title || 'N/A', 30)}</td>
+                        <td>${result.forms_found || 0}</td>
+                        <td>${result.links_found || 0}</td>
+                        <td title="${result.error || ''}">${truncateText(result.error || 'None', 50)}</td>
+                        <td>${screenshot}</td>
+                        <td>${timestamp}</td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
+        }
+
+        function displayTestResults(result) {
+            if (result.test_results) {
+                displayResults(result.test_results.map(test => ({
+                    ...test,
+                    timestamp: test.timestamp,
+                    domain: result.domain
+                })));
+            }
+        }
+
+        function truncateUrl(url, maxLength = 50) {
+            if (url.length <= maxLength) return url;
+            const parsed = new URL(url);
+            return parsed.pathname.length > maxLength - 10 ? 
+                parsed.hostname + '...' + parsed.pathname.slice(-20) : 
+                url.substring(0, maxLength) + '...';
+        }
+
+        function truncateText(text, maxLength) {
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        // Load initial results on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadResults();
+            
+            // Check if there's an ongoing test
+            checkTestStatus();
+        });
+
+        // Auto-refresh results every 30 seconds
+        setInterval(() => {
+            if (!testInProgress) {
+                loadResults();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

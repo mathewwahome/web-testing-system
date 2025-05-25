@@ -1,0 +1,314 @@
+# 🕷️ Web Testing System
+
+A comprehensive automated web testing and monitoring system that crawls your entire website, tests all routes, and provides detailed reports with crash detection and screenshot capture.
+
+## 🌟 Features
+
+- **Automated Web Crawling**: Discovers all pages and routes on your website
+- **Comprehensive Testing**: Tests each discovered URL for crashes and errors
+- **Authentication Support**: Can login and test authenticated routes
+- **Screenshot Capture**: Takes screenshots of each tested page
+- **Error Detection**: Identifies JavaScript errors, timeouts, and crashes
+- **Beautiful Web UI**: Modern, responsive interface for managing tests
+- **Detailed Reports**: Comprehensive test results with timestamps and metrics
+- **Docker Support**: Easy deployment with Docker containers
+- **Database Storage**: Persistent storage of all test results
+- **Real-time Status**: Live updates during test execution
+
+## 🚀 Quick Start with Docker
+
+### Prerequisites
+- Docker and Docker Compose installed on your system
+
+### 1. Clone and Setup
+```bash
+# Create project directory
+mkdir web-testing-system
+cd web-testing-system
+
+# Create the main application file
+cat > app.py << 'EOF'
+[Copy the Python code from the first artifact]
+EOF
+
+# Create the HTML template
+mkdir templates
+cat > templates/index.html << 'EOF'
+[Copy the HTML code from the second artifact]
+EOF
+
+# Create requirements.txt
+cat > requirements.txt << 'EOF'
+[Copy the requirements from the requirements artifact]
+EOF
+
+# Create Dockerfile
+cat > Dockerfile << 'EOF'
+[Copy the Dockerfile content]
+EOF
+
+# Create docker-compose.yml
+cat > docker-compose.yml << 'EOF'
+[Copy the docker-compose content]
+EOF
+```
+
+### 2. Build and Run
+```bash
+# Build the Docker image
+docker-compose build
+
+# Start the application
+docker-compose up -d
+
+# View logs
+docker-compose logs -f web-tester
+```
+
+### 3. Access the Application
+Open your browser and go to: `http://localhost:5000`
+
+## 🛠️ Manual Installation
+
+### Prerequisites
+- Python 3.9+
+- Google Chrome browser
+- ChromeDriver
+
+### 1. Install Chrome and ChromeDriver
+
+**Ubuntu/Debian:**
+```bash
+# Install Chrome
+wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+sudo apt-get update
+sudo apt-get install google-chrome-stable
+
+# Install ChromeDriver
+CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d. -f1)
+DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}")
+wget -O /tmp/chromedriver.zip "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+sudo unzip /tmp/chromedriver.zip -d /usr/local/bin/
+sudo chmod +x /usr/local/bin/chromedriver
+```
+
+**macOS:**
+```bash
+# Using Homebrew
+brew install --cask google-chrome
+brew install chromedriver
+```
+
+**Windows:**
+1. Download Chrome from https://www.google.com/chrome/
+2. Download ChromeDriver from https://chromedriver.chromium.org/
+3. Add ChromeDriver to your PATH
+
+### 2. Install Python Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run the Application
+```bash
+python app.py
+```
+
+## 📖 How to Use
+
+### 1. Start a New Test
+1. Enter your domain name (e.g., `example.com` or `https://example.com`)
+2. Optionally provide login credentials for authenticated testing
+3. Configure crawl depth and maximum URLs to test
+4. Click "Start Testing"
+
+### 2. Monitor Progress
+- Watch the real-time status indicator
+- View progress updates as the test runs
+- Monitor statistics as they update
+
+### 3. Review Results
+- Browse detailed test results in the table
+- Click on screenshot links to view page captures
+- Filter results by domain or time period
+- Export results for further analysis
+
+## ⚙️ Configuration Options
+
+### Test Parameters
+- **Domain**: The website to test (required)
+- **Login URL**: Page where authentication happens (optional)
+- **Username/Password**: Credentials for authenticated testing (optional)
+- **Max Depth**: How deep to crawl (1-5 levels)
+- **Max URLs**: Maximum number of URLs to test (25-200)
+
+### Advanced Configuration
+You can modify the following in `app.py`:
+
+```python
+# Database configuration
+DATABASE_PATH = "test_results.db"
+
+# Screenshot directory
+SCREENSHOTS_DIR = "screenshots"
+
+# Default timeout settings
+DEFAULT_TIMEOUT = 30  # seconds
+PAGE_LOAD_TIMEOUT = 15  # seconds
+
+# Chrome options
+CHROME_OPTIONS = [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--window-size=1920,1080"
+]
+```
+
+## 🐳 Docker Commands
+
+```bash
+# Build image
+docker-compose build
+
+# Start services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Restart services
+docker-compose restart
+
+# View service status
+docker-compose ps
+
+# Access container shell
+docker-compose exec web-tester bash
+
+# Clean up everything
+docker-compose down -v --rmi all
+```
+
+## 📊 API Endpoints
+
+The system provides REST API endpoints:
+
+- `POST /start_test` - Start a new test
+- `GET /test_status` - Check current test status
+- `GET /results` - Get test results
+- `GET /screenshots/<filename>` - View screenshots
+
+### Example API Usage
+```bash
+# Start a test
+curl -X POST http://localhost:5000/start_test \
+  -H "Content-Type: application/json" \
+  -d '{
+    "domain": "example.com",
+    "max_depth": 3,
+    "max_urls": 50
+  }'
+
+# Check status
+curl http://localhost:5000/test_status
+
+# Get results
+curl http://localhost:5000/results
+```
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Chrome/ChromeDriver Issues:**
+- Ensure Chrome and ChromeDriver versions are compatible
+- Update both to latest versions if having issues
+- Check if ChromeDriver is in your PATH
+
+**Permission Issues:**
+```bash
+# Fix screenshot directory permissions
+chmod 755 screenshots/
+chown -R $USER:$USER screenshots/
+```
+
+**Database Issues:**
+```bash
+# Reset database
+rm test_results.db
+# The application will recreate it automatically
+```
+
+**Memory Issues:**
+- Reduce `max_urls` parameter for large sites
+- Increase Docker memory limits if using containers
+- Monitor system resources during testing
+
+### Logs and Debugging
+
+```bash
+# View application logs
+docker-compose logs web-tester
+
+# Debug mode (for development)
+FLASK_DEBUG=1 python app.py
+
+# Increase log verbosity
+export PYTHONPATH=/app
+python -c "import logging; logging.basicConfig(level=logging.DEBUG)"
+```
+
+## 🔒 Security Considerations
+
+1. **Credentials**: Store login credentials securely, consider using environment variables
+2. **Network**: Run behind a reverse proxy in production
+3. **Access**: Restrict access to the web interface
+4. **Data**: Regularly backup test results and screenshots
+5. **Updates**: Keep Chrome and ChromeDriver updated
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🆘 Support
+
+If you encounter issues:
+
+1. Check the troubleshooting section above
+2. Review the logs for error messages
+3. Ensure all dependencies are properly installed
+4. Verify Chrome and ChromeDriver compatibility
+
+## 🔄 Updates and Maintenance
+
+### Regular Maintenance Tasks
+- Update Chrome and ChromeDriver monthly
+- Clean up old screenshots periodically
+- Backup test results database
+- Monitor disk space usage
+- Review and optimize test configurations
+
+### Upgrading
+```bash
+# Pull latest changes
+git pull origin main
+
+# Rebuild containers
+docker-compose build --no-cache
+
+# Restart services
+docker-compose up -d
+```
